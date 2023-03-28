@@ -20,6 +20,7 @@ dependencies:
   cupertino_icons: ^1.0.5
   pdf: 3.9.0
   url_launcher: any
+  window_manager: ^0.3.1
 
 dev_dependencies:
   flutter_test:

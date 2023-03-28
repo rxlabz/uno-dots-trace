@@ -21,7 +21,7 @@ class MacFigureEditorScreen extends StatelessWidget {
         top: TextButton.icon(
           onPressed: controller.newFigure,
           icon: const MacosIcon(CupertinoIcons.add_circled),
-          label: const Text('Nouvelle figure'),
+          label: const Text('New Page'),
         ),
         builder: (context, scroller) {
           return MacosTheme(
@@ -128,7 +128,7 @@ class MacFigureEditorScreen extends StatelessWidget {
                             icon: const MacosIcon(CupertinoIcons.printer),
                           ),
                           MacosIconButton(
-                            onPressed: controller.delete,
+                            onPressed: controller.figures.value.isEmpty ? null : controller.delete,
                             icon: const MacosIcon(
                               CupertinoIcons.delete,
                               color: Colors.red,
