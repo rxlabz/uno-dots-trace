@@ -5,6 +5,10 @@ import 'package:macos_ui/macos_ui.dart';
 import 'desktop_editor_controller.dart';
 import 'editor_canvas.dart';
 
+/// editor screen displays :
+/// - list of saved figures
+/// - tool bar
+/// - and canvas
 class MacFigureEditorScreen extends StatelessWidget {
   final DesktopEditorController controller;
 
@@ -78,23 +82,18 @@ class MacFigureEditorScreen extends StatelessWidget {
                             child: const Text('Save'),
                           ),
                           const Spacer(),
-                          ValueListenableBuilder(
-                            valueListenable: controller.toolSelection,
-                            builder: (context, value, _) {
-                              return Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: ToggleButtons(
-                                  isSelected: value,
-                                  selectedColor: Colors.cyan,
-                                  onPressed: controller.selectTool,
-                                  children: const [
-                                    Icon(Icons.edit),
-                                    Icon(Icons.pan_tool_alt),
-                                    Icon(CupertinoIcons.arrow_up_right),
-                                  ],
-                                ),
-                              );
-                            },
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: ToggleButtons(
+                              isSelected: controller.orientationSelection,
+                              selectedColor: Colors.cyan,
+                              onPressed: controller.selectTool,
+                              children: const [
+                                Icon(Icons.edit),
+                                Icon(Icons.pan_tool_alt),
+                                Icon(CupertinoIcons.arrow_up_right),
+                              ],
+                            ),
                           ),
                           Padding(
                             padding:
@@ -111,12 +110,7 @@ class MacFigureEditorScreen extends StatelessWidget {
                             ),
                           ),
                           MacosIconButton(
-                            onPressed: () async {
-                              if (await controller.imageController
-                                  .selectImage()) {
-                                controller.selectTool(1);
-                              }
-                            },
+                            onPressed: controller.selectImage,
                             icon: const MacosIcon(CupertinoIcons.photo),
                           ),
                           MacosIconButton(
@@ -128,7 +122,9 @@ class MacFigureEditorScreen extends StatelessWidget {
                             icon: const MacosIcon(CupertinoIcons.printer),
                           ),
                           MacosIconButton(
-                            onPressed: controller.figures.value.isEmpty ? null : controller.delete,
+                            onPressed: controller.figures.value.isEmpty
+                                ? null
+                                : controller.delete,
                             icon: const MacosIcon(
                               CupertinoIcons.delete,
                               color: Colors.red,
@@ -139,14 +135,7 @@ class MacFigureEditorScreen extends StatelessWidget {
                     ),
                   );
                 }),
-            Expanded(
-              child: ValueListenableBuilder(
-                valueListenable: controller.toolSelection,
-                builder: (context, selection, _) => FigureEditorCanvas(
-                  controller: controller,
-                ),
-              ),
-            )
+            Expanded(child: FigureEditorCanvas(controller: controller))
           ],
         ),
       ),

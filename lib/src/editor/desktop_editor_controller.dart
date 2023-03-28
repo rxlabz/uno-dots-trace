@@ -22,12 +22,8 @@ class DesktopEditorController extends EditorController {
 
   ValueNotifier<List<Figure>> figures = ValueNotifier([]);
 
-  /*ValueNotifier<List<bool>> toolSelection = ValueNotifier([true, false, false]);*/
-
   DesktopEditorController(this.service)
-      : titleController = TextEditingController(text: 'New document') {
-    imageController.addListener(notifyListeners);
-  }
+      : titleController = TextEditingController(text: 'New document');
 
   Future<void> init() async {
     figures.value = [...(await service.load()).map((e) => Figure.fromJson(e))]
@@ -44,10 +40,8 @@ class DesktopEditorController extends EditorController {
   void newFigure() {
     final newFigure = Figure(
       id: _uuid.v4(),
-      title: titleController.text,
-      points: enumerate(points.value)
-          .map((e) => e.value /*Point(e.value, e.index + 1)*/)
-          .toList(),
+      title: 'New document',
+      points: enumerate(points.value).map((e) => e.value).toList(),
     );
     figures.value = [newFigure, ...figures.value];
 
@@ -57,7 +51,7 @@ class DesktopEditorController extends EditorController {
 
   void open(Figure figure) {
     selection = figure;
-    points.value = figure.points /*.map((e) => e.position).toList()*/;
+    points.value = figure.points;
     titleController.text = figure.title;
     notifyListeners();
   }
@@ -70,9 +64,7 @@ class DesktopEditorController extends EditorController {
     final updatedFigure = Figure(
       id: selection!.id,
       title: titleController.text,
-      points: enumerate(points.value)
-          .map((e) => e.value /*Point(e.value, e.index + 1)*/)
-          .toList(),
+      points: enumerate(points.value).map((e) => e.value).toList(),
     );
     selection = updatedFigure;
 

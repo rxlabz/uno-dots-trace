@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'editor/editor_controller.dart';
-import 'editor/web_editor.dart';
+import 'src/editor/editor_controller.dart';
+import 'src/editor/web_editor.dart';
 
 void main() async {
   runApp(const WebApp());

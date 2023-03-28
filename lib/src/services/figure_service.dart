@@ -2,6 +2,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 const String _figureKey = 'figures';
 
+/// on Desktop : save and load figures
+/// figures are simply saved as list of json string
 class FigureService {
   final SharedPreferences prefs;
 

@@ -10,7 +10,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  tuple: ^2.0.1
   quiver: ^3.2.1
   path_provider: ^2.0.14
   file_picker: ^5.2.6

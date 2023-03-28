@@ -3,15 +3,26 @@ import 'package:macos_ui/macos_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
 
-import 'editor/desktop_editor_controller.dart';
-import 'editor/mac_editor.dart';
-import 'services/figure_service.dart';
+import 'src/editor/desktop_editor_controller.dart';
+import 'src/editor/mac_editor.dart';
+import 'src/services/figure_service.dart';
 
 const minSize = Size(1280, 960);
 
+/// Desktop MacosUI App
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  await initWindow();
+
+  final prefs = await SharedPreferences.getInstance();
+
+  final service = FigureService(prefs);
+
+  runApp(MacApp(service));
+}
+
+Future<void> initWindow() async {
   await windowManager.ensureInitialized();
   WindowOptions windowOptions = const WindowOptions(
     size: minSize,
@@ -22,14 +33,9 @@ void main() async {
     await windowManager.show();
     await windowManager.focus();
   });
-
-  final prefs = await SharedPreferences.getInstance();
-
-  final service = FigureService(prefs);
-
-  runApp(MacApp(service));
 }
 
+/// MacosApp
 class MacApp extends StatelessWidget {
   final FigureService service;
 
@@ -41,7 +47,6 @@ class MacApp extends StatelessWidget {
 
     return MacosApp(
       theme: MacosThemeData.light(),
-      darkTheme: MacosThemeData.dark(),
       themeMode: ThemeMode.light,
       home: MacFigureEditorScreen(controller: editorController),
     );

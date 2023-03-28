@@ -6,12 +6,17 @@ import 'package:flutter/material.dart';
 import 'package:quiver/iterables.dart' as qv;
 
 import '../model.dart';
-import '../rszr.dart';
-import 'draggable_image_box.dart';
+import 'widgets/rszr.dart';
+import 'widgets/draggable_image_box.dart';
 import 'editor_controller.dart';
+import 'widgets/web_file_image.dart'
+    if (dart.library.io) 'widgets/desktop_file_image.dart';
 
 const landscapeWidth = 1024.0;
 const portraitWidth = 768.0;
+
+const landscapeRatio = 1.414;
+const portraitRatio = 0.707;
 
 class FigureEditorCanvas extends StatelessWidget {
   final EditorController controller;
@@ -23,57 +28,56 @@ class FigureEditorCanvas extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-      valueListenable: controller.orientation,
-      builder: (context, value, _) {
-        return Center(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: AspectRatio(
-              aspectRatio: value.isLandscape ? 1.414 : 0.707,
-              child: LayoutBuilder(builder: (context, constraints) {
-                controller.size =
-                    Size(constraints.maxWidth, constraints.maxHeight);
-                return Material(
-                  color: Colors.white,
-                  elevation: 5,
-                  child: ValueListenableBuilder(
-                    valueListenable: controller.points,
-                    builder: (context, points, child) {
-                      return GestureDetector(
-                        onTapDown: controller.mode.isPen
-                            ? (e) => controller.addPoint(e.localPosition)
-                            : null,
-                        child: ValueListenableBuilder(
-                          valueListenable: controller.selectedPointIndex,
-                          builder: (context, selectedPointIndex, _) =>
-                              ValueListenableBuilder(
-                            valueListenable: controller.imageController,
-                            builder: (context, img, _) => EditorCanvas(
+    return AnimatedBuilder(
+        animation: controller,
+        builder: (context, _) {
+          final image = controller.image;
+
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: AspectRatio(
+                aspectRatio:
+                    controller.isLandscape ? landscapeRatio : portraitRatio,
+                child: LayoutBuilder(builder: (context, constraints) {
+                  controller.size =
+                      Size(constraints.maxWidth, constraints.maxHeight);
+                  return Material(
+                    color: Colors.white,
+                    elevation: 5,
+                    child: ValueListenableBuilder(
+                      valueListenable: controller.points,
+                      builder: (context, points, child) {
+                        return GestureDetector(
+                          onTapDown: controller.mode.isPen
+                              ? (e) => controller.addPoint(e.localPosition)
+                              : null,
+                          child: ValueListenableBuilder(
+                            valueListenable: controller.selectedPointIndex,
+                            builder: (context, selectedPointIndex, _) =>
+                                EditorCanvas(
                               points: points,
                               mode: controller.mode,
-                              backgroundImage: img,
+                              backgroundImage: image,
                               onPointUpdate: controller.updatePoint,
                               selectedPointIndex: selectedPointIndex,
                               onDeletePoint: (index) =>
                                   controller.deletePoint(index),
                               onSelectPoint: (index) =>
                                   controller.selectPoint(index),
-                              onDeleteImage: controller.imageController.clear,
+                              onDeleteImage: controller.deleteImage,
                               onClear: controller.clear,
                             ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
-                );
-              }),
+                        );
+                      },
+                    ),
+                  );
+                }),
+              ),
             ),
-          ),
-        );
-      },
-    );
+          );
+        });
   }
 }
 
@@ -124,10 +128,7 @@ class EditorCanvas extends StatelessWidget {
           DraggableBox(
             Resizer(
               onDelete: onDeleteImage,
-              child: Image.memory(
-                backgroundImage!.bytes!,
-                fit: BoxFit.contain,
-              ),
+              child: buildImageFromFile(backgroundImage!),
             ),
           ),
         Positioned.fill(

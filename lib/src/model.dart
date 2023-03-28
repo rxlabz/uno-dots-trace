@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'dart:ui';
 
-import 'package:tuple/tuple.dart';
-
 class Figure {
   final String id;
   final String title;
@@ -61,9 +59,4 @@ class Point {
 
   @override
   int get hashCode => position.hashCode ^ id.hashCode;
-}
-
-extension TupleUtils on Tuple2<Offset, Offset> {
-  Offset get first => item1;
-  Offset get last => item2;
 }

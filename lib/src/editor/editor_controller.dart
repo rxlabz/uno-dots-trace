@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart' as pdf;
 import 'package:pdf/widgets.dart' as pw;
@@ -8,11 +9,10 @@ import 'package:quiver/iterables.dart';
 import '../model.dart';
 import '../services/pdf_service_web.dart'
     if (dart.library.io) '../services/pdf_service.dart';
-import 'image_controller.dart';
-
-//const toPdfScale = 0.5;
 
 final rd = Random();
+
+const scaleRefWidth = 550.0;
 
 enum EditorMode {
   pen,
@@ -32,6 +32,30 @@ class EditorController extends ChangeNotifier {
   bool _randomIncrement = false;
 
   late Size size;
+
+  ValueNotifier<List<Point>> points = ValueNotifier([]);
+
+  List<bool> get toolSelection => List.generate(
+      EditorMode.values.length, (index) => EditorMode.values[index] == _mode);
+
+  EditorMode _mode = EditorMode.pen;
+
+  EditorMode get mode => _mode;
+
+  Orientation orientation = Orientation.landscape;
+  //ValueNotifier<Orientation> orientation = ValueNotifier(Orientation.landscape);
+
+  PlatformFile? _image;
+  PlatformFile? get image => _image;
+
+  List<bool> get orientationSelection => [isLandscape, !isLandscape];
+
+  bool get isLandscape => orientation.isLandscape;
+
+  ValueNotifier<int?> selectedPointIndex = ValueNotifier(null);
+
+  EditorController();
+
   bool get randomIncrement => _randomIncrement;
 
   set randomIncrement(bool value) {
@@ -40,31 +64,6 @@ class EditorController extends ChangeNotifier {
   }
 
   int get step => _randomIncrement ? rd.nextInt(3) + 1 : 1;
-
-  ValueNotifier<List<bool>> toolSelection = ValueNotifier([true, false, false]);
-
-  ValueNotifier<List<Point>> points = ValueNotifier([]);
-
-  ValueNotifier<Orientation> orientation = ValueNotifier(Orientation.landscape);
-
-  List<bool> get orientationSelection => [isLandscape, !isLandscape];
-
-  bool get isLandscape => orientation.value.isLandscape;
-
-  EditorMode get mode =>
-      EditorMode.values[toolSelection.value.indexWhere((element) => element)];
-
-  ValueNotifier<int?> selectedPointIndex = ValueNotifier(null);
-
-  final ImageNotifier imageController;
-
-  EditorController() : imageController = ImageNotifier();
-
-  @override
-  void dispose() {
-    imageController.removeListener(notifyListeners);
-    super.dispose();
-  }
 
   void addPoint(Offset p) {
     final nextId = points.value.isEmpty ? 1 : points.value.last.id + step;
@@ -101,7 +100,7 @@ class EditorController extends ChangeNotifier {
   Future<void> toPDF() async {
     // point le plus à droite
     // point le plus bas
-    final scale = 550 / (isLandscape ? size.height : size.width);
+    final scale = scaleRefWidth / (isLandscape ? size.height : size.width);
 
     final p = pw.Page(
       orientation: isLandscape
@@ -113,8 +112,7 @@ class EditorController extends ChangeNotifier {
           child: pw.Stack(
             children: enumerate(points.value).map(
               (e) {
-                final p = e.value.position *
-                    scale /*computeNodePosition(e.value.position)*/;
+                final p = e.value.position * scale;
                 return pw.Positioned(
                   left: p.dx,
                   top: p.dy,
@@ -158,12 +156,14 @@ class EditorController extends ChangeNotifier {
   }
 
   void selectTool(int index) {
-    toolSelection.value =
-        List.generate(EditorMode.values.length, (i) => index == i);
+    _mode = EditorMode.values[index];
+    notifyListeners();
   }
 
-  void toggleOrientation() => orientation.value =
-      isLandscape ? Orientation.portrait : Orientation.landscape;
+  void toggleOrientation() {
+    orientation = isLandscape ? Orientation.portrait : Orientation.landscape;
+    notifyListeners();
+  }
 
   void selectPoint(int index) => selectedPointIndex.value = index;
 
@@ -174,21 +174,26 @@ class EditorController extends ChangeNotifier {
 
     deletePoint(points.value.length - 1);
   }
-}
 
-const landscapeSize = Size(1024, 1024 * 0.707);
+  Future<void> selectImage() async {
+    final result = await FilePicker.platform.pickFiles(
+      dialogTitle: 'Select an image',
+      type: FileType.image,
+      allowMultiple: false,
+    );
+    final files = result?.files;
 
-const portraitSize = Size(768, 768);
+    if (files != null && files.isNotEmpty && (files.first.bytes != null || files.first.path != null)) {
+      _image = files.first;
+      selectTool(1);
 
-Offset computeNodePosition(
-  Offset p, {
-  orientation = Orientation.landscape,
-  double delta = 30,
-}) {
-  final center = (orientation == Icons.landscape ? landscapeSize : portraitSize)
-      .center(Offset.zero);
-  final x = p.dx > center.dx ? p.dx : p.dx - delta;
-  final y = p.dy > center.dy ? p.dy : p.dy - delta;
+      //notifyListeners();
+    }
 
-  return Offset(x, y);
+  }
+
+  void deleteImage() {
+    _image = null;
+    notifyListeners();
+  }
 }
