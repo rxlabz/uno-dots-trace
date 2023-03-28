@@ -88,7 +88,7 @@ class _EditorToolbar extends StatelessWidget {
                     isSelected: controller.toolSelection,
                     selectedColor: Colors.blueGrey.shade300,
                     color: Colors.blueGrey.shade700,
-                    onPressed: controller.selectTool,
+                    onPressed: controller.selectToolMode,
                     children: const [
                       Icon(Icons.polyline),
                       Icon(Icons.pan_tool),

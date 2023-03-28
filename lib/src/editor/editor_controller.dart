@@ -14,6 +14,10 @@ final rd = Random();
 
 const scaleRefWidth = 550.0;
 
+const landscapeRatio = 1.414;
+
+const portraitRatio = 0.707;
+
 enum EditorMode {
   pen,
   hand,
@@ -36,14 +40,12 @@ class EditorController extends ChangeNotifier {
   ValueNotifier<List<Point>> points = ValueNotifier([]);
 
   List<bool> get toolSelection => List.generate(
-      EditorMode.values.length, (index) => EditorMode.values[index] == _mode);
+      EditorMode.values.length, (index) => EditorMode.values[index] == _toolMode);
 
-  EditorMode _mode = EditorMode.pen;
-
-  EditorMode get mode => _mode;
+  EditorMode _toolMode = EditorMode.pen;
+  EditorMode get toolMode => _toolMode;
 
   Orientation orientation = Orientation.landscape;
-  //ValueNotifier<Orientation> orientation = ValueNotifier(Orientation.landscape);
 
   PlatformFile? _image;
   PlatformFile? get image => _image;
@@ -51,8 +53,6 @@ class EditorController extends ChangeNotifier {
   List<bool> get orientationSelection => [isLandscape, !isLandscape];
 
   bool get isLandscape => orientation.isLandscape;
-
-  ValueNotifier<int?> selectedPointIndex = ValueNotifier(null);
 
   EditorController();
 
@@ -64,6 +64,8 @@ class EditorController extends ChangeNotifier {
   }
 
   int get step => _randomIncrement ? rd.nextInt(3) + 1 : 1;
+
+  double get aspectRatio => isLandscape ? landscapeRatio : portraitRatio;
 
   void addPoint(Offset p) {
     final nextId = points.value.isEmpty ? 1 : points.value.last.id + step;
@@ -155,8 +157,8 @@ class EditorController extends ChangeNotifier {
     pdfService.save(doc);
   }
 
-  void selectTool(int index) {
-    _mode = EditorMode.values[index];
+  void selectToolMode(int index) {
+    _toolMode = EditorMode.values[index];
     notifyListeners();
   }
 
@@ -164,8 +166,6 @@ class EditorController extends ChangeNotifier {
     orientation = isLandscape ? Orientation.portrait : Orientation.landscape;
     notifyListeners();
   }
-
-  void selectPoint(int index) => selectedPointIndex.value = index;
 
   void clear() => points.value = [];
 
@@ -183,13 +183,14 @@ class EditorController extends ChangeNotifier {
     );
     final files = result?.files;
 
-    if (files != null && files.isNotEmpty && (files.first.bytes != null || files.first.path != null)) {
+    if (files != null &&
+        files.isNotEmpty &&
+        (files.first.bytes != null || files.first.path != null)) {
       _image = files.first;
-      selectTool(1);
+      selectToolMode(1);
 
       //notifyListeners();
     }
-
   }
 
   void deleteImage() {

@@ -87,7 +87,7 @@ class MacFigureEditorScreen extends StatelessWidget {
                             child: ToggleButtons(
                               isSelected: controller.orientationSelection,
                               selectedColor: Colors.cyan,
-                              onPressed: controller.selectTool,
+                              onPressed: controller.selectToolMode,
                               children: const [
                                 Icon(Icons.edit),
                                 Icon(Icons.pan_tool_alt),

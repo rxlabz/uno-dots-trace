@@ -15,8 +15,9 @@ import 'widgets/web_file_image.dart'
 const landscapeWidth = 1024.0;
 const portraitWidth = 768.0;
 
-const landscapeRatio = 1.414;
-const portraitRatio = 0.707;
+final rd = Random();
+
+const nodeRadius = 4.0;
 
 class FigureEditorCanvas extends StatelessWidget {
   final EditorController controller;
@@ -32,13 +33,11 @@ class FigureEditorCanvas extends StatelessWidget {
         animation: controller,
         builder: (context, _) {
           final image = controller.image;
-
           return Center(
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: AspectRatio(
-                aspectRatio:
-                    controller.isLandscape ? landscapeRatio : portraitRatio,
+                aspectRatio: controller.aspectRatio,
                 child: LayoutBuilder(builder: (context, constraints) {
                   controller.size =
                       Size(constraints.maxWidth, constraints.maxHeight);
@@ -49,25 +48,18 @@ class FigureEditorCanvas extends StatelessWidget {
                       valueListenable: controller.points,
                       builder: (context, points, child) {
                         return GestureDetector(
-                          onTapDown: controller.mode.isPen
+                          onTapDown: controller.toolMode.isPen
                               ? (e) => controller.addPoint(e.localPosition)
                               : null,
-                          child: ValueListenableBuilder(
-                            valueListenable: controller.selectedPointIndex,
-                            builder: (context, selectedPointIndex, _) =>
-                                EditorCanvas(
-                              points: points,
-                              mode: controller.mode,
-                              backgroundImage: image,
-                              onPointUpdate: controller.updatePoint,
-                              selectedPointIndex: selectedPointIndex,
-                              onDeletePoint: (index) =>
-                                  controller.deletePoint(index),
-                              onSelectPoint: (index) =>
-                                  controller.selectPoint(index),
-                              onDeleteImage: controller.deleteImage,
-                              onClear: controller.clear,
-                            ),
+                          child: EditorCanvas(
+                            points: points,
+                            mode: controller.toolMode,
+                            backgroundImage: image,
+                            onPointUpdate: controller.updatePoint,
+                            onDeletePoint: (index) =>
+                                controller.deletePoint(index),
+                            onDeleteImage: controller.deleteImage,
+                            onClear: controller.clear,
                           ),
                         );
                       },
@@ -81,8 +73,6 @@ class FigureEditorCanvas extends StatelessWidget {
   }
 }
 
-final rd = Random();
-
 class EditorCanvas extends StatelessWidget {
   final PlatformFile? backgroundImage;
   final List<Point> points;
@@ -91,11 +81,7 @@ class EditorCanvas extends StatelessWidget {
 
   final ValueChanged<int> onDeletePoint;
 
-  final ValueChanged<int> onSelectPoint;
-
   final EditorMode mode;
-
-  final int? selectedPointIndex;
 
   final VoidCallback onDeleteImage;
 
@@ -104,9 +90,7 @@ class EditorCanvas extends StatelessWidget {
   const EditorCanvas({
     required this.points,
     required this.mode,
-    required this.selectedPointIndex,
     required this.onPointUpdate,
-    required this.onSelectPoint,
     required this.onDeletePoint,
     required this.onDeleteImage,
     required this.onClear,
@@ -147,10 +131,7 @@ class EditorCanvas extends StatelessWidget {
               onPanUpdate: (d) =>
                   onPointUpdate(p.index, p.value.position + d.delta),
               onDoubleTap: () => onDeletePoint(p.index),
-              child: EditablePointView(
-                point: p.value,
-                selected: p.index == selectedPointIndex,
-              ),
+              child: EditablePointView(point: p.value, selected: false),
             ),
           ),
         Positioned(
@@ -171,8 +152,6 @@ class EditorCanvas extends StatelessWidget {
 
 class EditablePointView extends StatelessWidget {
   final Point point;
-  /*final int index;
-  final Offset position;*/
   final bool selected;
 
   const EditablePointView({
@@ -198,8 +177,6 @@ class EditablePointView extends StatelessWidget {
     );
   }
 }
-
-const nodeRadius = 4.0;
 
 class PointPainter extends CustomPainter {
   final Iterable<Offset> points;
@@ -227,10 +204,4 @@ class PointPainter extends CustomPainter {
   bool shouldRepaint(covariant PointPainter oldDelegate) {
     return points.length != oldDelegate.points.length;
   }
-
-/*@override
-  bool? hitTest(Offset position) {
-    return false;// TODO: implement hitTest
-    //return super.hitTest(position);
-  }*/
 }
