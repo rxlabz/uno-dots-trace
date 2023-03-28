@@ -1,0 +1,31 @@
+name: uno_dots_trace
+description: printable numbered dot2dot editor
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=2.19.3 <3.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  tuple: ^2.0.1
+  quiver: ^3.2.1
+  path_provider: ^2.0.14
+  file_picker: ^5.2.6
+  shared_preferences: ^2.0.20
+  uuid: any
+  macos_ui: ^1.2.0
+  cupertino_icons: ^1.0.5
+  pdf: 3.9.0
+  url_launcher: any
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
