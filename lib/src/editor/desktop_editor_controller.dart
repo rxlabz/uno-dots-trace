@@ -13,7 +13,13 @@ const _uuid = Uuid();
 class DesktopEditorController extends EditorController {
   final FigureService service;
 
-  Figure? selection;
+  Figure? _selection;
+  Figure? get selection => _selection;
+  set selection(Figure? f) {
+    _selection = f;
+
+    points.value = f?.points ?? [];
+  }
 
   int? get selectionIndex =>
       selection == null ? 0 : figures.value.indexOf(selection!);
@@ -41,7 +47,7 @@ class DesktopEditorController extends EditorController {
     final newFigure = Figure(
       id: _uuid.v4(),
       title: 'New document',
-      points: enumerate(points.value).map((e) => e.value).toList(),
+      points: [],
     );
     figures.value = [newFigure, ...figures.value];
 
@@ -51,7 +57,6 @@ class DesktopEditorController extends EditorController {
 
   void open(Figure figure) {
     selection = figure;
-    points.value = figure.points;
     titleController.text = figure.title;
     notifyListeners();
   }

@@ -69,7 +69,7 @@ class MacFigureEditorScreen extends StatelessWidget {
                       child: Row(
                         children: [
                           SizedBox(
-                            width: 240,
+                            width: 200,
                             child: Padding(
                               padding: const EdgeInsets.all(3),
                               child: MacosTextField(
@@ -83,6 +83,18 @@ class MacFigureEditorScreen extends StatelessWidget {
                           ),
                           const Spacer(),
                           Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 28.0),
+                            child: Row(
+                              children: [
+                                MacosIconButton(
+                                  onPressed: controller.selectImage,
+                                  icon: const MacosIcon(CupertinoIcons.photo),
+                                ),
+                                const Text('Background image')
+                              ],
+                            ),
+                          ),
+                          Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: ToggleButtons(
                               isSelected: controller.toolSelection,
@@ -92,6 +104,19 @@ class MacFigureEditorScreen extends StatelessWidget {
                                 Icon(Icons.edit),
                                 Icon(Icons.pan_tool_alt),
                                 Icon(CupertinoIcons.arrow_up_right),
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: ToggleButtons(
+                              isSelected: controller.orientationSelection,
+                              color: Colors.blueGrey.shade700,
+                              selectedColor: Colors.blueGrey.shade300,
+                              onPressed: (_) => controller.toggleOrientation(),
+                              children: const [
+                                Icon(Icons.landscape),
+                                Icon(Icons.portrait),
                               ],
                             ),
                           ),
@@ -109,13 +134,15 @@ class MacFigureEditorScreen extends StatelessWidget {
                               ],
                             ),
                           ),
+                          const VerticalDivider(
+                              color: Colors.blueGrey, width: 20, thickness: 1),
                           MacosIconButton(
-                            onPressed: controller.selectImage,
-                            icon: const MacosIcon(CupertinoIcons.photo),
-                          ),
-                          MacosIconButton(
-                            onPressed: controller.clear,
-                            icon: const MacosIcon(CupertinoIcons.clear),
+
+                            onPressed: controller.undo,
+                            icon: const MacosIcon(
+                              Icons.undo,
+                              color: Color(0xFF546E7A),
+                            ),
                           ),
                           MacosIconButton(
                             onPressed: controller.toPDF,

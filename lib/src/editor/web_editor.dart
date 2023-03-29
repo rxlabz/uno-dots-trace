@@ -68,17 +68,13 @@ class _EditorToolbar extends StatelessWidget {
                 const Spacer(),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 28.0),
-                  child: Row(
-                    children: [
-                      TextButton.icon(
-                        icon: const Icon(
-                          Icons.add_photo_alternate,
-                          color: Color(0xFF546E7A),
-                        ),
-                        label: const Text('Background image'),
-                        onPressed: controller.selectImage,
-                      ),
-                    ],
+                  child: TextButton.icon(
+                    icon: const Icon(
+                      Icons.add_photo_alternate,
+                      color: Color(0xFF546E7A),
+                    ),
+                    label: const Text('Background image'),
+                    onPressed: controller.selectImage,
                   ),
                 ),
                 const Text('Tools'),

@@ -30,46 +30,47 @@ class FigureEditorCanvas extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-        animation: controller,
-        builder: (context, _) {
-          final image = controller.image;
-          return Center(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: AspectRatio(
-                aspectRatio: controller.aspectRatio,
-                child: LayoutBuilder(builder: (context, constraints) {
-                  controller.size =
-                      Size(constraints.maxWidth, constraints.maxHeight);
-                  return Material(
-                    color: Colors.white,
-                    elevation: 5,
-                    child: ValueListenableBuilder(
-                      valueListenable: controller.points,
-                      builder: (context, points, child) {
-                        return GestureDetector(
-                          onTapDown: controller.toolMode.isPen
-                              ? (e) => controller.addPoint(e.localPosition)
-                              : null,
-                          child: EditorCanvas(
-                            points: points,
-                            mode: controller.toolMode,
-                            backgroundImage: image,
-                            onPointUpdate: controller.updatePoint,
-                            onDeletePoint: (index) =>
-                                controller.deletePoint(index),
-                            onDeleteImage: controller.deleteImage,
-                            onClear: controller.clear,
-                          ),
-                        );
-                      },
-                    ),
-                  );
-                }),
-              ),
+      animation: controller,
+      builder: (context, _) {
+        final image = controller.image;
+        return Center(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: AspectRatio(
+              aspectRatio: controller.aspectRatio,
+              child: LayoutBuilder(builder: (context, constraints) {
+                controller.size =
+                    Size(constraints.maxWidth, constraints.maxHeight);
+                return Material(
+                  color: Colors.white,
+                  elevation: 5,
+                  child: ValueListenableBuilder(
+                    valueListenable: controller.points,
+                    builder: (context, points, child) {
+                      return GestureDetector(
+                        onTapDown: controller.toolMode.isPen
+                            ? (e) => controller.addPoint(e.localPosition)
+                            : null,
+                        child: EditorCanvas(
+                          points: points,
+                          mode: controller.toolMode,
+                          backgroundImage: image,
+                          onPointUpdate: controller.updatePoint,
+                          onDeletePoint: (index) =>
+                              controller.deletePoint(index),
+                          onDeleteImage: controller.deleteImage,
+                          onClear: controller.clear,
+                        ),
+                      );
+                    },
+                  ),
+                );
+              }),
             ),
-          );
-        });
+          ),
+        );
+      },
+    );
   }
 }
 
